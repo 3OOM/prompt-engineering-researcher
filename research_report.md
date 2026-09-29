@@ -33,24 +33,37 @@ The following raw technical specifications, limits, and cost models were gathere
 
 ---
 
-## 2. Chain of Verification (CoVe) Audit Trail
+## 2. Chain of Verification (CoVe) 4-Step Audit Trail
 
-To prevent technical hallucinations and factual drift, the initial baseline report draft was subjected to an automated 3-step Chain of Verification (CoVe) cycle:
+To prevent technical hallucinations, inflated limits, and phantom pricing, the research workflow implemented the complete 4-step self-correcting Chain of Verification (CoVe) cycle:
 
-### CoVe Step 1: Formulate 4 Targeted Verification Questions
-1. **Question 1 (K8s Scale):** What is the exact official maximum supported node limit for a standard production Kubernetes cluster according to official Kubernetes.io documentation?
-2. **Question 2 (Docker Swarm Status):** Has Docker Swarm been officially deprecated and banned from commercial production deployment, or is Swarm mode still actively supported within Docker Engine?
-3. **Question 3 (AWS Fargate Pricing):** Does AWS Fargate charge a fixed monthly cluster fee or node management fee in addition to consumption metrics?
-4. **Question 4 (AWS Fargate Security Primitives):** Does AWS Fargate natively support running privileged root containers (`--privileged`) with host-level kernel access?
+### CoVe Step 1: Generate Initial Baseline Draft (Unverified)
+The baseline comparison report was generated using the ERA framework (Expectation, Role, Action) grounded in the initial fact sheet. While structurally sound, the unverified draft contained subtle hallucinations and factual discrepancies:
 
-### CoVe Step 2: Answer the Verification Questions via Verified Documentation
-- **Answer 1:** According to official [Kubernetes.io documentation](https://kubernetes.io/docs/setup/best-practices/cluster-large/), a standard Kubernetes cluster supports a maximum ceiling of **5,000 nodes**, **150,000 total pods**, and 300,000 total containers. The baseline draft claim of "15,000 nodes" is factually incorrect and unsupported.
-- **Answer 2:** Docker Swarm is **not deprecated**. While Mirantis acquired Docker Enterprise in 2019 and promoted Kubernetes within Mirantis Kubernetes Engine (MKE), Docker Swarm mode remains open-source, actively maintained, and fully supported within the core Docker Engine (Moby). It remains widely utilized for lightweight production setups.
-- **Answer 3:** AWS Fargate charges **zero base fees, zero cluster management fees, and zero hourly node fees**. Pricing is exclusively utility-based, calculated per vCPU-hour and GB-hour per second of container runtime. The baseline draft claim of a "mandatory $50/month maintenance fee" was an outright hallucination.
-- **Answer 4:** AWS Fargate **strictly forbids privileged containers**. In AWS ECS/EKS on Fargate, the `privileged` parameter in task definitions is unsupported and will fail validation. Because tasks execute inside isolated AWS microVMs, customers are blocked from accessing the underlying host kernel, raw network interfaces, or privileged Linux capabilities (`SYS_ADMIN`).
+> **[Baseline Draft Excerpt]:**
+> - *"Kubernetes boasts immense scalability, supporting up to 15,000 nodes per cluster natively..."* *(Factual error: 3x higher than official limit)*
+> - *"Because Mirantis officially deprecated Swarm in 2020 in favor of Kubernetes, it can no longer be legally licensed or safely deployed in modern production environments..."* *(Factual error: Swarm is open-source and actively supported in Docker Engine)*
+> - *"AWS Fargate bills users a mandatory $50/month cluster maintenance fee plus second-by-second billing..."* *(Hallucination: Fargate has zero base or cluster fees)*
+> - *"AWS Fargate natively supports privileged root containers and host-level kernel modifications..."* *(Factual error: Privileged containers are strictly prohibited)*
 
-### CoVe Step 3: Resolution & Correction Summary
-The baseline draft was completely revised. All four hallucinations were eradicated: K8s node limits were corrected from 15,000 to 5,000; the false claim of Docker Swarm deprecation was retracted; Fargate's fictitious cluster fees were removed; and Fargate's security sandbox constraints regarding privileged containers were accurately documented.
+*(The complete unverified baseline text is archived in [`baseline_draft.txt`](baseline_draft.txt).)*
+
+### CoVe Step 2: Formulate 4 Targeted Verification Questions
+Exactly four objective, documentation-verifiable questions were formulated to audit the unverified claims in the baseline draft:
+1. **Question 1 (K8s Scalability Ceiling):** What is the exact official maximum supported node and pod limit for a standard production Kubernetes cluster according to official Kubernetes.io documentation?
+2. **Question 2 (Docker Swarm Support Lifecycle):** Has Docker Swarm been officially deprecated and banned from commercial production deployment, or is Swarm mode still actively supported within Docker Engine?
+3. **Question 3 (AWS Fargate Pricing Architecture):** Does AWS Fargate charge a fixed monthly cluster fee, base fee, or node management fee in addition to vCPU/RAM consumption metrics?
+4. **Question 4 (AWS Fargate Security & Privilege Primitives):** Does AWS Fargate natively support running privileged root containers (`--privileged`) with host-level kernel access?
+
+### CoVe Step 3: Answer Verification Questions via Verified Documentation
+Each verification question was answered independently by cross-referencing official developer documentation:
+- **Verified Answer 1:** According to official [Kubernetes.io Scalability Thresholds](https://kubernetes.io/docs/setup/best-practices/cluster-large/), a standard production cluster supports a maximum ceiling of **5,000 nodes**, **150,000 total pods**, and up to 110 pods per node (default). The baseline draft claim of "15,000 nodes" was a 300% hallucination.
+- **Verified Answer 2:** Docker Swarm is **not deprecated**. While Mirantis acquired Docker Enterprise in 2019 and promoted Kubernetes in MKE, Docker Swarm mode remains open-source, actively maintained, and fully supported within the core Docker Engine (Moby) and Docker Desktop. It remains widely deployed for lightweight production orchestration.
+- **Verified Answer 3:** AWS Fargate charges **zero base fees, zero cluster management fees, and zero node fees**. Pricing is exclusively utility-based, billed strictly per vCPU-second and GB-second of memory allocated to the container task. The baseline claim of a "mandatory $50/month maintenance fee" was a complete hallucination.
+- **Verified Answer 4:** AWS Fargate **strictly forbids privileged containers**. In AWS ECS/EKS on Fargate, the `privileged` parameter in task definitions is unsupported and fails validation. Fargate executes containers inside isolated AWS Firecracker microVMs; users cannot access host kernel modules, raw network interfaces, or privileged Linux capabilities (`SYS_ADMIN`).
+
+### CoVe Step 4: Apply Verified Corrections & Rewrite Report
+All four verified corrections were synthesized into the baseline draft to produce the finalized, hallucination-free research report detailed in Section 3 below.
 
 ---
 
